@@ -21,10 +21,9 @@ public class User {
 
     private String email;
 
-    private String nom;
-
     private String keycloakId;
 
-    private String role;
+    private String password;
+
 
 }

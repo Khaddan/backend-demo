@@ -6,7 +6,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.example.auth.entities.Role;
 
 @Data
 @Builder
@@ -19,8 +18,5 @@ public class RegisterRequest {
     private String password;
     @NotBlank
     private String email;
-    @Email
-    private String nom;  // corresponds to first name
-    @NotBlank
-    private String role; // should be a string, like "user"
+
 }

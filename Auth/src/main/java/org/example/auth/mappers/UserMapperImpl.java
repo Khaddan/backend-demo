@@ -12,8 +12,7 @@ public class UserMapperImpl implements UserMapper {
         User user = new User();
         user.setUsername(request.getUsername());
         user.setEmail(request.getEmail());
-        user.setEmail(request.getEmail());
-        user.setKeycloakId("22");
+        user.setPassword(request.getPassword());
         return user;
     }
 
@@ -23,8 +22,6 @@ public class UserMapperImpl implements UserMapper {
         userResponse.setUsername(user.getUsername());
         userResponse.setEmail(user.getEmail());
         userResponse.setId(user.getId());
-        userResponse.setRole(user.getRole());
-        userResponse.setNom(user.getNom());
         return userResponse;
     }
 }
