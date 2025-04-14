@@ -56,51 +56,79 @@ public class UserServiceImpl implements UserService {
     @Value("${keycloak.credentials.secret}")
     private String clientSecret;
 
-//    @Override
-//    public UserResponse registerUser(RegisterRequest request) {
-//
-//        // 1️⃣ Créer l'utilisateur dans Keycloak
-//        UsersResource usersResource = keycloak.realm(realm).users();
-//        UserRepresentation kcUser = new UserRepresentation();
-//        kcUser.setUsername(request.getUsername());
-//        kcUser.setEmail(request.getEmail());
-//        kcUser.setFirstName(request.getNom());
-//        kcUser.setEnabled(true);
-//        //Response response = usersResource.create(kcUser);
-//        if (response.getStatus() != 201) {
-//            throw new RuntimeException("Erreur Keycloak: " + response.getStatus());
-//        }
-//        String keycloakId = response.getLocation().getPath().replaceAll(".*/([^/]+)$", "$1");
-//
-//        // 2️⃣ Définir mot de passe
-//        CredentialRepresentation password = new CredentialRepresentation();
-//        password.setTemporary(false);
-//        password.setType(CredentialRepresentation.PASSWORD);
-//        password.setValue(request.getPassword());
-//        usersResource.get(keycloakId).resetPassword(password);
-//
-//        // 3️⃣ Attribuer le rôle
-//        RoleRepresentation role = keycloak.realm(realm)
-//                .roles()
-//                .get(String.valueOf(request.getRole()))
-//                .toRepresentation();
-//
-//        usersResource.get(keycloakId)
-//                .roles()
-//                .realmLevel()
-//                .add(Collections.singletonList(role));
-//
-//        // 4️⃣ Sauvegarder dans la base
-//        User user = userMapper.fromRegisterRequest(request);
-//        user.setKeycloakId(keycloakId);
-//        User savedUser = userRepository.save(user);
-//
-//        return userMapper.toUserResponse(savedUser);
-//    }
-
     @Override
     public UserResponse registerUser(RegisterRequest request) {
-        return null;
+        try {
+            // 1️⃣ Build the user registration JSON payload
+            UserRepresentation kcUser = new UserRepresentation();
+            kcUser.setUsername(request.getUsername());
+            kcUser.setEmail(request.getEmail());
+            kcUser.setFirstName(request.getNom());
+            kcUser.setEnabled(true);
+            // Optionally, add more fields like lastName if needed.
+            // Ensure not to include extra fields like 'userProfileMetadata'
+
+            ObjectMapper objectMapper = new ObjectMapper();
+            String userJson = objectMapper.writeValueAsString(kcUser);
+
+            // 2️⃣ Build the registration endpoint URL
+            String url = serverUrl + "/admin/realms/" + realm + "/users";
+
+            // 3️⃣ Get an access token (still using the Keycloak admin SDK)
+            String token = keycloak.tokenManager().getAccessToken().getToken();
+
+            // 4️⃣ Create an HTTP request using HttpClient
+            HttpClient client = HttpClient.newHttpClient();
+            HttpRequest httpRequest = HttpRequest.newBuilder()
+                    .uri(URI.create(url))
+                    .header("Authorization", "Bearer " + token)
+                    .header("Content-Type", "application/json")
+                    .POST(HttpRequest.BodyPublishers.ofString(userJson))
+                    .build();
+
+            // 5️⃣ Send the request and capture the response
+            HttpResponse<String> httpResponse = client.send(httpRequest, HttpResponse.BodyHandlers.ofString());
+
+            // If user creation fails, throw an error with details
+            if (httpResponse.statusCode() != 201) {
+                throw new RuntimeException("Registration failed: " + httpResponse.statusCode() + " ➜ " + httpResponse.body());
+            }
+
+            // 6️⃣ Extract the new user's Keycloak ID from the Location header
+            String locationHeader = httpResponse.headers().firstValue("Location")
+                    .orElseThrow(() -> new RuntimeException("Registration succeeded but no Location header found"));
+            String keycloakId = locationHeader.replaceAll(".*/([^/]+)$", "$1");
+
+            // 7️⃣ Set the user's password using the Keycloak Admin SDK
+            CredentialRepresentation password = new CredentialRepresentation();
+            password.setTemporary(false);
+            password.setType(CredentialRepresentation.PASSWORD);
+            password.setValue(request.getPassword());
+            keycloak.realm(realm).users().get(keycloakId).resetPassword(password);
+
+            // 8️⃣ Assign the appropriate role using the Keycloak Admin SDK
+            RoleRepresentation role = keycloak.realm(realm)
+                    .roles()
+                    .get(String.valueOf(request.getRole()))
+                    .toRepresentation();
+
+            keycloak.realm(realm)
+                    .users()
+                    .get(keycloakId)
+                    .roles()
+                    .realmLevel()
+                    .add(Collections.singletonList(role));
+
+            // 9️⃣ Save the user details to your local database
+            User user = userMapper.fromRegisterRequest(request);
+            user.setKeycloakId(keycloakId);
+            User savedUser = userRepository.save(user);
+
+            return userMapper.toUserResponse(savedUser);
+
+        } catch (Exception e) {
+            throw new RuntimeException("Registration error: " + e.getMessage(), e);
+        }
     }
 
     @Override
