@@ -1,0 +1,16 @@
+spring:
+  cloud:
+    gateway:
+      globalcors:
+        corsConfigurations:
+          '[/**]':
+            allowedOrigins: "*"  # Replace with your React app's origin
+            allowedHeaders: "*"                     # Allows all headers
+            allowedMethods:                         # Allows all HTTP methods
+              - GET
+              - POST
+              - PUT
+              - DELETE
+              - PATCH
+              - OPTIONS
+              - HEAD
