@@ -1,6 +1,5 @@
 package org.example.auth.configs;
 
-import jakarta.ws.rs.client.ClientBuilder;
 import org.keycloak.OAuth2Constants;
 import org.keycloak.admin.client.Keycloak;
 import org.keycloak.admin.client.KeycloakBuilder;

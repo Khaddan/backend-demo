@@ -11,6 +11,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -30,9 +31,16 @@ public class AuthController {
         return ResponseEntity.ok(userService.login(request));
     }
 
-    @GetMapping("/me")
+    @GetMapping("/all")
+    public ResponseEntity<List<UserResponse>> getAllUser() throws Exception {
+        return ResponseEntity.ok(userService.getAllUsers());
+    }
+
+    @GetMapping("/current")
     public ResponseEntity<UserResponse> getCurrentUser(@AuthenticationPrincipal Jwt jwt) {
         return ResponseEntity.ok(userService.getCurrentUser(jwt));
     }
+
+
 
 }
