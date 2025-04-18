@@ -1,0 +1,49 @@
+version: '3.1'
+
+services:
+
+  postgres-db:
+    image: postgres:13
+    container_name: postgres-open-banking-it
+    environment:
+      POSTGRES_DB: adaptive-it
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 2001
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - postgres-network
+
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: pgadmin-open-banking-it
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@open.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+    ports:
+      - "5050:80"
+    depends_on:
+      - postgres-db
+    networks:
+      - postgres-network
+
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:23.0.7
+    environment:
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
+    command: start-dev
+    ports:
+      - "9000:8080"
+#    volumes:
+#      - ./keycloak/realm-export.json:/opt/keycloak/data/import/realm-export.json
+
+volumes:
+  postgres_data:
+  keycloak_data:
+
+networks:
+  postgres-network:

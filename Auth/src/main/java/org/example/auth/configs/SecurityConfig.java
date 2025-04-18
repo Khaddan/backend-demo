@@ -3,6 +3,7 @@ package org.example.auth.configs;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.Customizer;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
@@ -29,6 +30,6 @@ public class SecurityConfig {
     // ✅ Required for proper JWT verification
     @Bean
     public JwtDecoder jwtDecoder() {
-        return JwtDecoders.fromIssuerLocation("http://localhost:8080/realms/auth-service");
+        return JwtDecoders.fromIssuerLocation("http://localhost:9000/realms/test_realm");
     }
 }
