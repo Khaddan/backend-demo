@@ -64,6 +64,8 @@ public class UserServiceImpl implements UserService {
             UserRepresentation kcUser = new UserRepresentation();
             kcUser.setUsername(request.getUsername());
             kcUser.setEmail(request.getEmail());
+            kcUser.setFirstName(request.getPrenom());
+            kcUser.setLastName(request.getNom());
             kcUser.setEnabled(true);
 
             ObjectMapper objectMapper = new ObjectMapper();
@@ -93,6 +95,8 @@ public class UserServiceImpl implements UserService {
             } else if (httpResponse.statusCode() == 403) {
                 System.out.println("⚠️ 403 Forbidden — fallback to user search");
                 List<UserRepresentation> users = keycloak.realm(realm).users().search(request.getUsername());
+                // Ajoutez un log pour afficher les en-têtes de la requête
+                //System.out.println("Headers envoyés : " + clientInvocation.getHeaders());
                 if (users.isEmpty()) {
                     throw new RuntimeException("User possibly created but not found.");
                 }
@@ -187,6 +191,8 @@ public class UserServiceImpl implements UserService {
                         UserResponse dto = new UserResponse();
                         dto.setUsername(user.getUsername());
                         dto.setEmail(user.getEmail());
+                        dto.setNom(user.getFirstName());
+                        dto.setPrenom(user.getLastName());
                         return dto;
                     })
                     .collect(Collectors.toList());
