@@ -4,7 +4,7 @@ spring:
       globalcors:
         corsConfigurations:
           '[/**]':
-            allowedOrigins: "*"  # Replace with your React app's origin
+            allowedOrigins: "http://localhost:5173"  # Replace with your React app's origin
             allowedHeaders: "*"                     # Allows all headers
             allowedMethods:                         # Allows all HTTP methods
               - GET

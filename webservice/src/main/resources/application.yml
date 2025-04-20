@@ -1,0 +1,11 @@
+spring:
+  application:
+    name: webservice
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:9000/realms/test_realm
+
+server:
+  port: 8089

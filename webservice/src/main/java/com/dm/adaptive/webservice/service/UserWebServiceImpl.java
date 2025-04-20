@@ -11,7 +11,7 @@ import org.springframework.web.client.RestTemplate;
 public class UserWebServiceImpl implements UserWebService {
 
     private final RestTemplate restTemplate;
-    private static final String USER_SERVICE_URL = "http://localhost:8082/auth";
+    private static final String USER_SERVICE_URL = "http://localhost:8999/auth";
 
     public UserWebServiceImpl(RestTemplate restTemplate) {
         this.restTemplate = restTemplate;

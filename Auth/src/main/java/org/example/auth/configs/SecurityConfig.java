@@ -12,6 +12,8 @@ import org.springframework.security.web.SecurityFilterChain;
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
+
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
@@ -29,6 +31,6 @@ public class SecurityConfig {
     // ✅ Required for proper JWT verification
     @Bean
     public JwtDecoder jwtDecoder() {
-        return JwtDecoders.fromIssuerLocation("http://localhost:8080/realms/auth-service");
+        return JwtDecoders.fromIssuerLocation("http://localhost:9000/realms/test_realm");
     }
 }

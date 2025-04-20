@@ -15,19 +15,19 @@ public class WebController {
         this.userWebService = userWebService;
     }
 
-    @GetMapping("/auth/current")
+    @GetMapping("/users/{id}")
     public ResponseEntity<String> GetUser(@PathVariable Long id) {
         String result = userWebService.getUser(id);
         return ResponseEntity.ok(result);
     }
 
-    @PostMapping("/register")
+    @PostMapping("/users")
     public ResponseEntity<String> CreateUser(@RequestBody String userPayload) {
         String result = userWebService.createUser(userPayload);
         return ResponseEntity.ok(result);
     }
 
-    @GetMapping("/all")
+    @GetMapping("/users")
     public ResponseEntity<String> GetUsers() {
         String result = userWebService.getAllUsers();
         return ResponseEntity.ok(result);
